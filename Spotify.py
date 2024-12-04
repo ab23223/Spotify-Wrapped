@@ -27,6 +27,7 @@ def get_top_items():
         print(f"{idx + 1}. {item['name']} by {', '.join(artist['name'] for artist in item['artists'])}")
 
     # Get top artists
+
     top_artists = sp.current_user_top_artists(limit=50, time_range='long_term')
     print("\nYour Top 50 Artists:")
     for idx, artist in enumerate(top_artists['items']):

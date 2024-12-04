@@ -2,6 +2,7 @@ from flask import Flask, jsonify, send_from_directory
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+import spotifyapp
 
 app = Flask(__name__)
 
@@ -23,7 +24,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
 
 @app.route('/')
 def index():
-    return send_from_directory('/spotify_wrapped.html')  # Serve the HTML page
+    return spotifyapp.get_top_items()
 
 @app.route('/get-top-items')
 def get_top_items():
