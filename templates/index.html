@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Wrapped</title>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Spotify_logo_with_text.svg/2560px-Spotify_logo_with_text.svg.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -39,13 +40,56 @@
         .list-item {
             margin-bottom: 10px;
         }
+
+        img{
+            width: 30%;
+            padding-top: 50px;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #1db954;
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: #000;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #1db954;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #14833b;
+        }
+
+        label {
+            font-size: 18px;
+            margin-right: 10px;
+            color: #ffffff;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Your Spotify Wrapped</h1>
         <p>See your top tracks and artists from Spotify!</p>
-        
+    
+        <label for="result-limit">Number of Results:</label>
+        <input type="number" id="result-limit" min="1" max="50" value="10">
+        <button onclick="fetchSpotifyWrapped()">Show Results</button>
+
         <div id="results">
             <!-- Results will be displayed here -->
         </div>
@@ -54,10 +98,15 @@
     <script>
         async function fetchSpotifyWrapped() {
             try {
-                const response = await fetch('/get-top-items'); // Backend endpoint
+                const limit = document.getElementById('result-limit').value; // Get the user input value
+                const response = await fetch(`/get-top-items?limit=${limit}`); // Send the limit to the backend
                 const data = await response.json();
 
+
                 const resultsDiv = document.getElementById('results');
+
+                // Clear previous results
+                resultsDiv.innerHTML = '';
 
                 // Display total listening time
                 const totalMinutes = document.createElement('p');
@@ -74,7 +123,7 @@
                 // Display favorite artist
                 if (data.favoriteArtist) {
                     const favoriteArtist = document.createElement('p');
-                    favoriteArtist.innerHTML = `<strong>Favorite Artist:</strong> ${data.favoriteArtist.name}`;
+                    favoriteArtist.innerHTML = `<strong>Favorite Artist:</strong> <strong>${data.favoriteArtist.name}</strong>`;
                     resultsDiv.appendChild(favoriteArtist);
                 }
 
@@ -86,8 +135,8 @@
                 data.topTracks.forEach((track, index) => {
                     const item = document.createElement('div');
                     item.className = 'list-item';
-                    item.innerText = `${index + 1}. ${track.name} by ${track.artists.join(', ')}`;
-                    tracksList.appendChild(item);
+                    item.innerHTML = `${index + 1}. ${track.name} by 
+                ${track.artists.map(artist => `<strong>${artist}</strong>`).join(', ')}`;                    tracksList.appendChild(item);
                 });
                 topTracks.appendChild(tracksList);
 

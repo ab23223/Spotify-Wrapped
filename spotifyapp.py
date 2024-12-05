@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_from_directory, render_template
+from flask import Flask, jsonify, send_from_directory, render_template, request
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -30,8 +30,12 @@ def index():
 @app.route('/get-top-items')
 def get_top_items():
     try:
+        # Get the limit from query parameters (default to 10 if not provided)
+        limit = int(request.args.get('limit', 10))
+        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 50
+
         # Fetch top tracks
-        top_tracks_data = sp.current_user_top_tracks(limit=10, time_range='long_term')
+        top_tracks_data = sp.current_user_top_tracks(limit=limit, time_range='short_term')
         top_tracks = [
             {
                 'name': track['name'],
@@ -41,7 +45,7 @@ def get_top_items():
         ]
 
         # Fetch top artists
-        top_artists_data = sp.current_user_top_artists(limit=10, time_range='long_term')
+        top_artists_data = sp.current_user_top_artists(limit=limit, time_range='short_term')
         top_artists = [
             {'name': artist['name']}
             for artist in top_artists_data['items']
