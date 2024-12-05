@@ -7,7 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
+            margin-left: 100px;
+            margin-right: 100px;
             padding: 0;
             background-color: #121212;
             color: #ffffff;
@@ -21,7 +22,15 @@
             border-radius: 8px;
         }
         h1 {
-            font-size: 2em;
+            font-size: 70px;
+        }
+
+        p{
+            font-size: 20px;
+        }
+
+        h2{
+            font-size: 50px;
         }
         .list {
             text-align: left;
@@ -50,6 +59,26 @@
 
                 const resultsDiv = document.getElementById('results');
 
+                // Display total listening time
+                const totalMinutes = document.createElement('p');
+                totalMinutes.innerHTML = `<strong>Total Listening Time:</strong> ${data.totalMinutes} minutes`;
+                resultsDiv.appendChild(totalMinutes);
+
+                // Display favorite track
+                if (data.favoriteTrack) {
+                    const favoriteTrack = document.createElement('p');
+                    favoriteTrack.innerHTML = `<strong>Favorite Track:</strong> ${data.favoriteTrack.name} by ${data.favoriteTrack.artists.join(', ')}`;
+                    resultsDiv.appendChild(favoriteTrack);
+                }
+
+                // Display favorite artist
+                if (data.favoriteArtist) {
+                    const favoriteArtist = document.createElement('p');
+                    favoriteArtist.innerHTML = `<strong>Favorite Artist:</strong> ${data.favoriteArtist.name}`;
+                    resultsDiv.appendChild(favoriteArtist);
+                }
+
+                // Display top tracks
                 const topTracks = document.createElement('div');
                 topTracks.innerHTML = '<h2>Top Tracks</h2>';
                 const tracksList = document.createElement('div');
@@ -62,6 +91,7 @@
                 });
                 topTracks.appendChild(tracksList);
 
+                // Display top artists
                 const topArtists = document.createElement('div');
                 topArtists.innerHTML = '<h2>Top Artists</h2>';
                 const artistsList = document.createElement('div');

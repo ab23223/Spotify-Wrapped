@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, render_template
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -22,15 +22,16 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     scope=scope
 ))
 
+
 @app.route('/')
 def index():
-    return spotifyapp.get_top_items()
+    return render_template('index.html')
 
 @app.route('/get-top-items')
 def get_top_items():
     try:
         # Fetch top tracks
-        top_tracks_data = sp.current_user_top_tracks(limit=10, time_range='medium_term')
+        top_tracks_data = sp.current_user_top_tracks(limit=10, time_range='long_term')
         top_tracks = [
             {
                 'name': track['name'],
@@ -40,13 +41,26 @@ def get_top_items():
         ]
 
         # Fetch top artists
-        top_artists_data = sp.current_user_top_artists(limit=10, time_range='medium_term')
+        top_artists_data = sp.current_user_top_artists(limit=10, time_range='long_term')
         top_artists = [
             {'name': artist['name']}
             for artist in top_artists_data['items']
         ]
 
-        return jsonify({'topTracks': top_tracks, 'topArtists': top_artists})
+        # Calculate total listening time
+        total_minutes = sum(track['duration_ms'] for track in top_tracks_data['items']) // 60000
+
+        # Favorite track and artist
+        favorite_track = top_tracks[0] if top_tracks else None
+        favorite_artist = top_artists[0] if top_artists else None
+
+        return jsonify({
+            'topTracks': top_tracks,
+            'topArtists': top_artists,
+            'totalMinutes': total_minutes,
+            'favoriteTrack': favorite_track,
+            'favoriteArtist': favorite_artist
+        })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
