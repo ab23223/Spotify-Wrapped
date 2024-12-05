@@ -26,6 +26,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
 @app.route('/')
 def index():
     return render_template('index.html')
+    
 
 @app.route('/get-top-items')
 def get_top_items():
@@ -35,7 +36,7 @@ def get_top_items():
         limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 50
 
         # Fetch top tracks
-        top_tracks_data = sp.current_user_top_tracks(limit=limit, time_range='short_term')
+        top_tracks_data = sp.current_user_top_tracks(limit=limit, time_range='long_term')
         top_tracks = [
             {
                 'name': track['name'],
@@ -45,7 +46,7 @@ def get_top_items():
         ]
 
         # Fetch top artists
-        top_artists_data = sp.current_user_top_artists(limit=limit, time_range='short_term')
+        top_artists_data = sp.current_user_top_artists(limit=limit, time_range='long_term')
         top_artists = [
             {'name': artist['name']}
             for artist in top_artists_data['items']
@@ -54,6 +55,18 @@ def get_top_items():
         # Calculate total listening time
         total_minutes = sum(track['duration_ms'] for track in top_tracks_data['items']) // 60000
 
+
+        # Aggregate genres from top artists
+        genre_count = {}
+        for artist in top_artists_data['items']:
+            for genre in artist['genres']:
+                genre_count[genre] = genre_count.get(genre, 0) + 1
+
+        # Sort genres by count
+        sorted_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)
+        top_genres = [{'genre': genre, 'count': count} for genre, count in sorted_genres]
+
+
         # Favorite track and artist
         favorite_track = top_tracks[0] if top_tracks else None
         favorite_artist = top_artists[0] if top_artists else None
@@ -61,6 +74,7 @@ def get_top_items():
         return jsonify({
             'topTracks': top_tracks,
             'topArtists': top_artists,
+            'topGenres': top_genres,
             'totalMinutes': total_minutes,
             'favoriteTrack': favorite_track,
             'favoriteArtist': favorite_artist

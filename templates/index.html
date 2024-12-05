@@ -25,12 +25,10 @@
         h1 {
             font-size: 70px;
         }
-
-        p{
+        p {
             font-size: 20px;
         }
-
-        h2{
+        h2 {
             font-size: 50px;
         }
         .list {
@@ -40,12 +38,10 @@
         .list-item {
             margin-bottom: 10px;
         }
-
-        img{
+        img {
             width: 30%;
             padding-top: 50px;
         }
-
         input[type="number"] {
             width: 80px;
             padding: 8px;
@@ -57,7 +53,6 @@
             text-align: center;
             margin-right: 10px;
         }
-
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -68,17 +63,14 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-
         button:hover {
             background-color: #14833b;
         }
-
         label {
             font-size: 18px;
             margin-right: 10px;
             color: #ffffff;
         }
-
     </style>
 </head>
 <body>
@@ -93,8 +85,12 @@
         <div id="results">
             <!-- Results will be displayed here -->
         </div>
-    </div>
 
+        <div id="chart-container" style="width: 80%; margin: 20px auto;">
+            <canvas id="genreChart"></canvas>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         async function fetchSpotifyWrapped() {
             try {
@@ -102,11 +98,8 @@
                 const response = await fetch(`/get-top-items?limit=${limit}`); // Send the limit to the backend
                 const data = await response.json();
 
-
                 const resultsDiv = document.getElementById('results');
-
-                // Clear previous results
-                resultsDiv.innerHTML = '';
+                resultsDiv.innerHTML = ''; // Clear previous results
 
                 // Display total listening time
                 const totalMinutes = document.createElement('p');
@@ -123,7 +116,7 @@
                 // Display favorite artist
                 if (data.favoriteArtist) {
                     const favoriteArtist = document.createElement('p');
-                    favoriteArtist.innerHTML = `<strong>Favorite Artist:</strong> <strong>${data.favoriteArtist.name}</strong>`;
+                    favoriteArtist.innerHTML = `<strong>Favorite Artist:</strong> ${data.favoriteArtist.name}`;
                     resultsDiv.appendChild(favoriteArtist);
                 }
 
@@ -135,10 +128,11 @@
                 data.topTracks.forEach((track, index) => {
                     const item = document.createElement('div');
                     item.className = 'list-item';
-                    item.innerHTML = `${index + 1}. ${track.name} by 
-                ${track.artists.map(artist => `<strong>${artist}</strong>`).join(', ')}`;                    tracksList.appendChild(item);
+                    item.innerHTML = `${index + 1}. ${track.name} by ${track.artists.map(artist => `<strong>${artist}</strong>`).join(', ')}`;
+                    tracksList.appendChild(item);
                 });
                 topTracks.appendChild(tracksList);
+                resultsDiv.appendChild(topTracks);
 
                 // Display top artists
                 const topArtists = document.createElement('div');
@@ -152,18 +146,124 @@
                     artistsList.appendChild(item);
                 });
                 topArtists.appendChild(artistsList);
-
-                resultsDiv.appendChild(topTracks);
                 resultsDiv.appendChild(topArtists);
+
+                // Display top genres chart
+                const genreData = data.topGenres.slice(0, 8); // shows top 8 genres
+                const genreLabels = genreData.map(genre => genre.genre);
+                const genreCounts = genreData.map(genre => genre.count);
+
+                const ctx = document.getElementById('genreChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: genreLabels,
+                    datasets: [
+                        {
+                            label: 'Top Genres',
+                            data: genreCounts,
+                            backgroundColor: [
+                               '#FF6384', // Solid red
+                                '#36A2EB', // Solid blue
+                                '#FFCE56', // Solid yellow
+                                '#4BC0C0', // Solid teal
+                                '#9966FF', // Solid purple
+                                '#FF9F40', // Solid orange
+                                '#964B00', // Solid brown
+                            ], // Colors for each bar
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(29, 185, 84, 1)',
+                            ],
+                            borderWidth: 0.1, // Add borders
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }, // Hide legend
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.label}: ${context.raw}`,
+                            },
+                        },
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.2)', // Light gridlines for X-axis
+                            },
+                            ticks: {
+                                color: '#ffffff', // Make X-axis labels visible
+                            },
+                            title: {
+                                display: true,
+                                text: 'Genres',
+                                color: '#ffffff',
+                            },
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.2)', // Light gridlines for Y-axis
+                            },
+                            ticks: {
+                                color: '#ffffff', // Make Y-axis labels visible
+                            },
+                            title: {
+                                display: true,
+                                text: 'Count',
+                                color: '#ffffff',
+                            },
+                        },
+                    },
+                },
+            });
+
             } catch (error) {
                 console.error('Error fetching Spotify Wrapped:', error);
-                const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = '<p>Failed to load data. Please try again later.</p>';
             }
         }
 
-        // Call the function to fetch data
+            // Function to fetch and display recently played songs in real-time
+        async function fetchRecentlyPlayed() {
+            try {
+                const response = await fetch('/get-recently-played'); // Fetch recently played tracks
+                const data = await response.json();
+
+                const recentlyPlayedDiv = document.getElementById('recently-played');
+                recentlyPlayedDiv.innerHTML = '<h2>Recently Played Songs</h2>'; // Clear and reset section
+
+                const songsList = document.createElement('div');
+                songsList.className = 'list';
+                data.recentlyPlayed.forEach((song, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item';
+                    item.innerHTML = `${index + 1}. ${song.name} by ${song.artists.map(artist => `<strong>${artist}</strong>`).join(', ')}`;
+                    songsList.appendChild(item);
+                });
+
+                recentlyPlayedDiv.appendChild(songsList);
+            } catch (error) {
+                console.error('Error fetching recently played songs:', error);
+                const recentlyPlayedDiv = document.getElementById('recently-played');
+                recentlyPlayedDiv.innerHTML = '<p>Failed to load recently played songs. Please try again later.</p>';
+            }
+        }
+
+        // Update recently played songs every 10 seconds
+        setInterval(fetchRecentlyPlayed, 10000);
+
+        // Initial data fetch
         fetchSpotifyWrapped();
+        fetchRecentlyPlayed();
     </script>
 </body>
 </html>
