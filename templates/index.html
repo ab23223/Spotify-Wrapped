@@ -34,6 +34,7 @@
         .list {
             text-align: left;
             margin-top: 20px;
+            margin-bottom: 70px;
         }
         .list-item {
             margin-bottom: 10px;
@@ -71,6 +72,14 @@
             margin-right: 10px;
             color: #ffffff;
         }
+        #recently-played {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            padding-bottom: 30px;
+            background-color: #1db954;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -90,6 +99,12 @@
             <canvas id="genreChart"></canvas>
         </div>
     </div>
+    <label for="recently-played-limit">Recently Played Songs:</label>
+    <input type="number" id="recently-played-limit" min="1" max="50" value="10">
+    <button onclick="fetchRecentlyPlayed()">Show Recently Played</button>
+
+    <div id="recently-played"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         async function fetchSpotifyWrapped() {
@@ -233,35 +248,36 @@
         }
 
             // Function to fetch and display recently played songs in real-time
-        async function fetchRecentlyPlayed() {
-            try {
-                const response = await fetch('/get-recently-played'); // Fetch recently played tracks
-                const data = await response.json();
+            async function fetchRecentlyPlayed() {
+    try {
+        const limit = document.getElementById('recently-played-limit').value; // Get user input for the number of songs
+        const response = await fetch(`/get-recently-played?limit=${limit}`); // Send the limit to the backend
+        const data = await response.json();
 
-                const recentlyPlayedDiv = document.getElementById('recently-played');
-                recentlyPlayedDiv.innerHTML = '<h2>Recently Played Songs</h2>'; // Clear and reset section
+        const recentlyPlayedDiv = document.getElementById('recently-played');
+        recentlyPlayedDiv.innerHTML = '<h2>Recently Played Songs</h2>'; // Clear and reset section
 
-                const songsList = document.createElement('div');
-                songsList.className = 'list';
-                data.recentlyPlayed.forEach((song, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'list-item';
-                    item.innerHTML = `${index + 1}. ${song.name} by ${song.artists.map(artist => `<strong>${artist}</strong>`).join(', ')}`;
-                    songsList.appendChild(item);
-                });
+        const songsList = document.createElement('div');
+        songsList.className = 'list';
+        data.recentlyPlayed.forEach((song, index) => {
+            const item = document.createElement('div');
+            item.className = 'list-item';
+            item.innerHTML = `${index + 1}. ${song.name} by ${song.artists.map(artist => `<strong>${artist}</strong>`).join(', ')}`;
+            songsList.appendChild(item);
+        });
 
-                recentlyPlayedDiv.appendChild(songsList);
-            } catch (error) {
-                console.error('Error fetching recently played songs:', error);
-                const recentlyPlayedDiv = document.getElementById('recently-played');
-                recentlyPlayedDiv.innerHTML = '<p>Failed to load recently played songs. Please try again later.</p>';
-            }
-        }
+        recentlyPlayedDiv.appendChild(songsList);
+    } catch (error) {
+        console.error('Error fetching recently played songs:', error);
+        const recentlyPlayedDiv = document.getElementById('recently-played');
+        recentlyPlayedDiv.innerHTML = '<p>Failed to load recently played songs. Please try again later.</p>';
+    }
+}
 
-        // Update recently played songs every 10 seconds
+        // Fetch recently played songs every 1 seconds
         setInterval(fetchRecentlyPlayed, 10000);
 
-        // Initial data fetch
+        // Initial fetch calls
         fetchSpotifyWrapped();
         fetchRecentlyPlayed();
     </script>

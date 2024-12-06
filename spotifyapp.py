@@ -12,7 +12,10 @@ SPOTIFY_CLIENT_SECRET = 'f3067bc3408f49b99c8c23f284862b2b'
 SPOTIFY_REDIRECT_URI = 'https://open.spotify.com/'
 
 # Spotify authentication scope
-scope = "user-top-read"
+
+scope = "user-top-read user-read-recently-played"
+
+
 
 # Spotipy client setup
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
@@ -28,12 +31,35 @@ def index():
     return render_template('index.html')
     
 
+@app.route('/get-recently-played')
+def get_recently_played():
+    try:
+        limit = int(request.args.get('limit', 10))
+        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 200
+        # Fetch recently played tracks (Spotify allows 50 recently played tracks)
+        recent_tracks_data = sp.current_user_recently_played(limit=limit)  # Adjust limit as needed
+
+        # Extract track names and artist names
+        recently_played = [
+            {
+                'name': track['track']['name'],
+                'artists': [artist['name'] for artist in track['track']['artists']]
+            }
+            for track in recent_tracks_data['items']
+        ]
+
+        return jsonify({'recentlyPlayed': recently_played})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/get-top-items')
 def get_top_items():
     try:
         # Get the limit from query parameters (default to 10 if not provided)
         limit = int(request.args.get('limit', 10))
-        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 50
+        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 200
 
         # Fetch top tracks
         top_tracks_data = sp.current_user_top_tracks(limit=limit, time_range='long_term')
