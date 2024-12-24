@@ -4,56 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Wrapped</title>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Spotify_logo_with_text.svg/2560px-Spotify_logo_with_text.svg.png">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin-left: 100px;
-            margin-right: 100px;
+            font-family: 'Circular', 'Arial', sans-serif;
+            margin: 0;
             padding: 0;
             background-color: #121212;
             color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .header {
             text-align: center;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
             padding: 20px;
-            background-color: #1db954;
-            border-radius: 8px;
         }
+
+        .header img {
+            width: 200px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         h1 {
-            font-size: 70px;
-        }
-        p {
-            font-size: 20px;
-        }
-        h2 {
             font-size: 50px;
+            margin: 20px 0;
         }
-        .list {
-            text-align: left;
-            margin-top: 20px;
-            margin-bottom: 70px;
+
+        p {
+            font-size: 18px;
+            margin: 10px 0;
         }
-        .list-item {
-            margin-bottom: 10px;
+
+        .form-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
         }
-        img {
-            width: 30%;
-            padding-top: 50px;
-        }
+
         input[type="number"] {
-            width: 80px;
-            padding: 8px;
+            width: 100px;
+            padding: 10px;
             font-size: 16px;
             border: 2px solid #1db954;
             border-radius: 5px;
             background-color: #ffffff;
-            color: #000;
+            color: #121212;
             text-align: center;
-            margin-right: 10px;
         }
+
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -64,46 +68,75 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+
         button:hover {
             background-color: #14833b;
         }
-        label {
-            font-size: 18px;
-            margin-right: 10px;
-            color: #ffffff;
-        }
-        #recently-played {
-            max-width: 800px;
-            margin: 50px auto;
+
+        .section {
+            background-color: #181818;
             padding: 20px;
-            padding-bottom: 30px;
-            background-color: #1db954;
-            border-radius: 8px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .list-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #282828;
+            border-radius: 5px;
+        }
+
+        .chart-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        canvas {
+            margin: 0 auto;
+            width: 600px;
+            height: 400px;
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Spotify_logo_with_text.svg/2560px-Spotify_logo_with_text.svg.png" alt="Spotify Logo">
+    </div>
+
     <div class="container">
         <h1>Your Spotify Wrapped</h1>
-        <p>See your top tracks and artists from Spotify!</p>
-    
-        <label for="result-limit">Number of Results:</label>
-        <input type="number" id="result-limit" min="1" max="50" value="10">
-        <button onclick="fetchSpotifyWrapped()">Show Results</button>
+        <p>See your top tracks, artists, and genres for the year!</p>
 
-        <div id="results">
-            <!-- Results will be displayed here -->
+        <div class="form-section">
+            <label for="result-limit">Number of Results:</label>
+            <input type="number" id="result-limit" min="1" max="50" value="10">
+            <button onclick="fetchSpotifyWrapped()">Show Results</button>
         </div>
 
-        <div id="chart-container" style="width: 80%; margin: 20px auto;">
+        <div id="results" class="section">
+            <!-- Results will appear here -->
+        </div>
+
+        <div class="chart-container">
             <canvas id="genreChart"></canvas>
         </div>
-    </div>
-    <label for="recently-played-limit">Recently Played Songs:</label>
-    <input type="number" id="recently-played-limit" min="1" max="50" value="10">
-    <button onclick="fetchRecentlyPlayed()">Show Recently Played</button>
 
-    <div id="recently-played"></div>
+        <div class="form-section">
+            <label for="recently-played-limit">Recently Played:</label>
+            <input type="number" id="recently-played-limit" min="1" max="50" value="10">
+            <button onclick="fetchRecentlyPlayed()">Show Recently Played</button>
+        </div>
+
+        <div id="recently-played" class="section">
+            <!-- Recently Played Songs will appear here -->
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
