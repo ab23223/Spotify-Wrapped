@@ -35,29 +35,18 @@ def index():
 def get_recently_played():
     try:
         limit = int(request.args.get('limit', 10))
-        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 50
+        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 200
+        # Fetch recently played tracks (Spotify allows 50 recently played tracks)
+        recent_tracks_data = sp.current_user_recently_played(limit=limit)  # Adjust limit as needed
 
-        # Fetch recently played tracks (Spotify allows up to 50 recently played tracks)
-        recent_tracks_data = sp.current_user_recently_played(limit=limit - 1)  # Fetch one less to include the custom track
-
-        # Extract track names, artist names, and track URLs
+        # Extract track names and artist names
         recently_played = [
             {
                 'name': track['track']['name'],
-                'artists': [artist['name'] for artist in track['track']['artists']],
-                'url': track['track']['external_urls']['spotify']
+                'artists': [artist['name'] for artist in track['track']['artists']]
             }
             for track in recent_tracks_data['items']
         ]
-
-        # Add the custom song
-        custom_song = {
-            'name': "Stand Up (Kick Love into Motion)",
-            'artists': ["Def Leppard"],
-            'url': "https://open.spotify.com/track/0dr71rw5oIcPtUHRJES6gP?si=6766bb5ae24f4d50"
-            
-        }
-        recently_played.insert(0, custom_song)  # Add the custom song at the top of the list
 
         return jsonify({'recentlyPlayed': recently_played})
 

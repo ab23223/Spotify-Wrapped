@@ -262,9 +262,7 @@
         data.recentlyPlayed.forEach((song, index) => {
             const item = document.createElement('div');
             item.className = 'list-item';
-            item.innerHTML = `
-                ${index + 1}. <a href="${song.url}" target="_blank">${song.name}</a> by ${song.artists.map(artist => `<strong>${artist}</strong>`).join(', ')}
-            `;
+            item.innerHTML = `${index + 1}. ${song.name} by ${song.artists.map(artist => `<strong>${artist}</strong>`).join(', ')}`;
             songsList.appendChild(item);
         });
 
@@ -275,7 +273,6 @@
         recentlyPlayedDiv.innerHTML = '<p>Failed to load recently played songs. Please try again later.</p>';
     }
 }
-
 
         // Fetch recently played songs every 1 seconds
         setInterval(fetchRecentlyPlayed, 10000);
