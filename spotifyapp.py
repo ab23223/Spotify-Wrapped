@@ -57,12 +57,17 @@ def get_recently_played():
 @app.route('/get-top-items')
 def get_top_items():
     try:
-        # Get the limit from query parameters (default to 10 if not provided)
+        # Get the limit and time_range from query parameters
         limit = int(request.args.get('limit', 10))
-        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 200
+        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 50
+
+        # Validate the time_range parameter
+        time_range = request.args.get('time_range', 'long_term')
+        if time_range not in ['long_term', 'medium_term', 'short_term']:
+            return jsonify({'error': 'Invalid time_range value'}), 400
 
         # Fetch top tracks
-        top_tracks_data = sp.current_user_top_tracks(limit=limit, time_range='long_term')
+        top_tracks_data = sp.current_user_top_tracks(limit=limit, time_range=time_range)
         top_tracks = [
             {
                 'name': track['name'],
@@ -72,7 +77,7 @@ def get_top_items():
         ]
 
         # Fetch top artists
-        top_artists_data = sp.current_user_top_artists(limit=limit, time_range='long_term')
+        top_artists_data = sp.current_user_top_artists(limit=limit, time_range=time_range)
         top_artists = [
             {'name': artist['name']}
             for artist in top_artists_data['items']
@@ -80,7 +85,6 @@ def get_top_items():
 
         # Calculate total listening time
         total_minutes = sum(track['duration_ms'] for track in top_tracks_data['items']) // 60000
-
 
         # Aggregate genres from top artists
         genre_count = {}
@@ -91,7 +95,6 @@ def get_top_items():
         # Sort genres by count
         sorted_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)
         top_genres = [{'genre': genre, 'count': count} for genre, count in sorted_genres]
-
 
         # Favorite track and artist
         favorite_track = top_tracks[0] if top_tracks else None
@@ -108,6 +111,5 @@ def get_top_items():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 if __name__ == '__main__':
     app.run(debug=True)
