@@ -1,0 +1,99 @@
+    <style>
+        body {
+            font-family: 'Circular', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header img {
+            width: 200px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 50px;
+            margin: 20px 0;
+        }
+
+        p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .form-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        input[type="number"], select {
+            width: 150px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #1db954;
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: #121212;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #1db954;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #14833b;
+        }
+
+        .section {
+            background-color: #181818;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .list-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #282828;
+            border-radius: 5px;
+        }
+
+        .chart-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        canvas {
+            margin: 0 auto;
+            width: 1000px;
+            height: 400px;
+        }
+    </style>

@@ -35,7 +35,11 @@ def index():
 def get_recently_played():
     try:
         limit = int(request.args.get('limit', 10))
-        limit = max(1, min(limit, 50))  # Ensure the limit is between 1 and 200
+        limit = max(1, min(limit, 50))  # Ensure limit is between 1 and 50
+        time_range = request.args.get('time_range', 'long_term')
+        if time_range not in ['long_term', 'medium_term', 'short_term']:
+            return jsonify({'error': 'Invalid time_range value'}), 400
+
         # Fetch recently played tracks (Spotify allows 50 recently played tracks)
         recent_tracks_data = sp.current_user_recently_played(limit=limit)  # Adjust limit as needed
 
@@ -111,5 +115,6 @@ def get_top_items():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
 if __name__ == '__main__':
-    app.run(debug=True)
+ app.run(debug=True)
