@@ -25,7 +25,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     scope=scope
 ))
 
-
+ 
 @app.route('/')
 def index():
     return render_template('index.html')
