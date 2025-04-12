@@ -30,7 +30,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
 def index():
     return render_template('index.html')
     
-
+ 
 @app.route('/get-recently-played')
 def get_recently_played():
     try:
